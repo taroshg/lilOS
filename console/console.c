@@ -18,6 +18,14 @@ void print_character_with_color(char c, VGA_Color bg_color, VGA_Color font_color
 		update_cursor();
 		return;
 	}
+
+	if (c == '\b'){
+		VGA_MEMORY[(term_pos - 1) * 2] = ' ';
+        VGA_MEMORY[(term_pos - 1) * 2 + 1] = 0x07;
+		term_pos--;
+		update_cursor();
+		return;
+	}
 	VGA_MEMORY[term_pos * 2] = c;
 	VGA_MEMORY[term_pos * 2 + 1] = (bg_color << 4) | font_color;;
 	term_pos++;
