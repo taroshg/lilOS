@@ -3,6 +3,7 @@
 #include <stdint.h>
 
 static int term_pos = 0;
+static int TAB_SIZE = 4;
 static char* VGA_MEMORY = (char*) 0xb8000;
 
 static VGA_Color terminal_font_color = LIGHT_GRAY; // Default font color will be light gray
@@ -13,12 +14,21 @@ void print_character(char c) {
 }
 
 void print_character_with_color(char c, VGA_Color bg_color, VGA_Color font_color){
+	// new line
 	if (c == '\n'){
 		term_pos = (term_pos / VGA_WIDTH + 1) * VGA_WIDTH;
 		update_cursor();
 		return;
 	}
 
+	// tab
+	if (c == '\t'){
+		term_pos += TAB_SIZE;
+		update_cursor();
+		return;
+	}
+
+	// backspace
 	if (c == '\b'){
 		if (term_pos < 1) return;
 		VGA_MEMORY[(term_pos - 1) * 2] = ' ';
@@ -27,6 +37,14 @@ void print_character_with_color(char c, VGA_Color bg_color, VGA_Color font_color
 		update_cursor();
 		return;
 	}
+
+	// carriage (escape btn)
+	if (c == 0x1B){
+		term_pos = (term_pos / VGA_WIDTH) * VGA_WIDTH;
+		update_cursor();
+		return;
+	}
+
 
 	VGA_MEMORY[term_pos * 2] = c;
 	VGA_MEMORY[term_pos * 2 + 1] = (bg_color << 4) | font_color;;
