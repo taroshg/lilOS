@@ -20,16 +20,19 @@ void print_character_with_color(char c, VGA_Color bg_color, VGA_Color font_color
 	}
 
 	if (c == '\b'){
+		if (term_pos < 1) return;
 		VGA_MEMORY[(term_pos - 1) * 2] = ' ';
-        VGA_MEMORY[(term_pos - 1) * 2 + 1] = 0x07;
+        VGA_MEMORY[(term_pos - 1) * 2 + 1] = terminal_background_color;
 		term_pos--;
 		update_cursor();
 		return;
 	}
+
 	VGA_MEMORY[term_pos * 2] = c;
 	VGA_MEMORY[term_pos * 2 + 1] = (bg_color << 4) | font_color;;
 	term_pos++;
 	update_cursor();
+	return;
 }
 
 void print_string(char* str){
@@ -59,7 +62,7 @@ void clear_terminal(){
     int cells = 80 * 25;
     for (int i = 0; i < cells; i++){
         VGA_MEMORY[i * 2] = ' ';       // Set character to space
-        VGA_MEMORY[i * 2 + 1] = 0x07; // Set attribute
+        VGA_MEMORY[i * 2 + 1] = terminal_background_color; // Set attribute
     }
 	term_pos = 0;
 	update_cursor();
